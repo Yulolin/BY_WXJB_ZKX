@@ -80,6 +80,24 @@ public partial class @RPGInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Framwork"",
+                    ""type"": ""Button"",
+                    ""id"": ""f92658a9-de73-46ac-829f-1729f750d5ec"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Magic"",
+                    ""type"": ""Button"",
+                    ""id"": ""8650b39b-586c-41a3-9721-82b3e48f2857"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -192,6 +210,28 @@ public partial class @RPGInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""HeavyAttack"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6eb752ba-8300-43b1-ba8b-3c1af7d2d538"",
+                    ""path"": ""<Keyboard>/#(F)"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Framwork"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2489a258-a269-4e93-99ff-293d2fc08aac"",
+                    ""path"": ""<Keyboard>/#(E)"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Magic"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -234,6 +274,8 @@ public partial class @RPGInputActions: IInputActionCollection2, IDisposable
         m_PC_Dodge = m_PC.FindAction("Dodge", throwIfNotFound: true);
         m_PC_LightAttack = m_PC.FindAction("LightAttack", throwIfNotFound: true);
         m_PC_HeavyAttack = m_PC.FindAction("HeavyAttack", throwIfNotFound: true);
+        m_PC_Framwork = m_PC.FindAction("Framwork", throwIfNotFound: true);
+        m_PC_Magic = m_PC.FindAction("Magic", throwIfNotFound: true);
         // New action map
         m_Newactionmap = asset.FindActionMap("New action map", throwIfNotFound: true);
         m_Newactionmap_Newaction = m_Newactionmap.FindAction("New action", throwIfNotFound: true);
@@ -304,6 +346,8 @@ public partial class @RPGInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_PC_Dodge;
     private readonly InputAction m_PC_LightAttack;
     private readonly InputAction m_PC_HeavyAttack;
+    private readonly InputAction m_PC_Framwork;
+    private readonly InputAction m_PC_Magic;
     public struct PCActions
     {
         private @RPGInputActions m_Wrapper;
@@ -314,6 +358,8 @@ public partial class @RPGInputActions: IInputActionCollection2, IDisposable
         public InputAction @Dodge => m_Wrapper.m_PC_Dodge;
         public InputAction @LightAttack => m_Wrapper.m_PC_LightAttack;
         public InputAction @HeavyAttack => m_Wrapper.m_PC_HeavyAttack;
+        public InputAction @Framwork => m_Wrapper.m_PC_Framwork;
+        public InputAction @Magic => m_Wrapper.m_PC_Magic;
         public InputActionMap Get() { return m_Wrapper.m_PC; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -341,6 +387,12 @@ public partial class @RPGInputActions: IInputActionCollection2, IDisposable
             @HeavyAttack.started += instance.OnHeavyAttack;
             @HeavyAttack.performed += instance.OnHeavyAttack;
             @HeavyAttack.canceled += instance.OnHeavyAttack;
+            @Framwork.started += instance.OnFramwork;
+            @Framwork.performed += instance.OnFramwork;
+            @Framwork.canceled += instance.OnFramwork;
+            @Magic.started += instance.OnMagic;
+            @Magic.performed += instance.OnMagic;
+            @Magic.canceled += instance.OnMagic;
         }
 
         private void UnregisterCallbacks(IPCActions instance)
@@ -363,6 +415,12 @@ public partial class @RPGInputActions: IInputActionCollection2, IDisposable
             @HeavyAttack.started -= instance.OnHeavyAttack;
             @HeavyAttack.performed -= instance.OnHeavyAttack;
             @HeavyAttack.canceled -= instance.OnHeavyAttack;
+            @Framwork.started -= instance.OnFramwork;
+            @Framwork.performed -= instance.OnFramwork;
+            @Framwork.canceled -= instance.OnFramwork;
+            @Magic.started -= instance.OnMagic;
+            @Magic.performed -= instance.OnMagic;
+            @Magic.canceled -= instance.OnMagic;
         }
 
         public void RemoveCallbacks(IPCActions instance)
@@ -434,6 +492,8 @@ public partial class @RPGInputActions: IInputActionCollection2, IDisposable
         void OnDodge(InputAction.CallbackContext context);
         void OnLightAttack(InputAction.CallbackContext context);
         void OnHeavyAttack(InputAction.CallbackContext context);
+        void OnFramwork(InputAction.CallbackContext context);
+        void OnMagic(InputAction.CallbackContext context);
     }
     public interface INewactionmapActions
     {
