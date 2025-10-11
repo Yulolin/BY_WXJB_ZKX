@@ -25,6 +25,8 @@ public class DodgeState :PlayerState
         {
             dodgeDir = player.transform.forward;
         }
+        Vector3 lookAtPosition = new Vector3(player.transform.position.x+dodgeDir.x, player.transform.position.y, player.transform.position.z+dodgeDir.z);
+        player.transform.LookAt(lookAtPosition);
     }
 
     public override void BeAttacked(int damage)

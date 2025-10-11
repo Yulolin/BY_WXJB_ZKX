@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Threading.Tasks;
+using UnityEngine;
 
 public class EHitState : EnemyState
 {
@@ -20,10 +21,18 @@ public class EHitState : EnemyState
         {
             isDie = true;
             animator.SetBool("Death", true);
+            Die();
         }
         animator.SetTrigger("Hit");
     }
 
+    async Task Die()
+    {
+        // 等待3秒
+        await Task.Delay(5 * 1000);
+        zombile.gameObject.SetActive(false);
+    }
+    
     public override void Update()
     {
         
