@@ -6,6 +6,7 @@ public enum EStateType{
     Pursuit,
     Hit,
     Attack,
+    BeExecute
 }
 
 public abstract class EnemyState

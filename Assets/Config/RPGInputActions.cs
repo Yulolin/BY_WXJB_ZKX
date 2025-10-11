@@ -98,6 +98,15 @@ public partial class @RPGInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Execute"",
+                    ""type"": ""Button"",
+                    ""id"": ""93064a99-89eb-4560-a77f-f45a7cba70f2"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -232,6 +241,17 @@ public partial class @RPGInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Magic"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d7053e5d-fc33-400d-9aa8-27d27043fae1"",
+                    ""path"": ""<Keyboard>/#(R)"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Execute"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -276,6 +296,7 @@ public partial class @RPGInputActions: IInputActionCollection2, IDisposable
         m_PC_HeavyAttack = m_PC.FindAction("HeavyAttack", throwIfNotFound: true);
         m_PC_Framwork = m_PC.FindAction("Framwork", throwIfNotFound: true);
         m_PC_Magic = m_PC.FindAction("Magic", throwIfNotFound: true);
+        m_PC_Execute = m_PC.FindAction("Execute", throwIfNotFound: true);
         // New action map
         m_Newactionmap = asset.FindActionMap("New action map", throwIfNotFound: true);
         m_Newactionmap_Newaction = m_Newactionmap.FindAction("New action", throwIfNotFound: true);
@@ -348,6 +369,7 @@ public partial class @RPGInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_PC_HeavyAttack;
     private readonly InputAction m_PC_Framwork;
     private readonly InputAction m_PC_Magic;
+    private readonly InputAction m_PC_Execute;
     public struct PCActions
     {
         private @RPGInputActions m_Wrapper;
@@ -360,6 +382,7 @@ public partial class @RPGInputActions: IInputActionCollection2, IDisposable
         public InputAction @HeavyAttack => m_Wrapper.m_PC_HeavyAttack;
         public InputAction @Framwork => m_Wrapper.m_PC_Framwork;
         public InputAction @Magic => m_Wrapper.m_PC_Magic;
+        public InputAction @Execute => m_Wrapper.m_PC_Execute;
         public InputActionMap Get() { return m_Wrapper.m_PC; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -393,6 +416,9 @@ public partial class @RPGInputActions: IInputActionCollection2, IDisposable
             @Magic.started += instance.OnMagic;
             @Magic.performed += instance.OnMagic;
             @Magic.canceled += instance.OnMagic;
+            @Execute.started += instance.OnExecute;
+            @Execute.performed += instance.OnExecute;
+            @Execute.canceled += instance.OnExecute;
         }
 
         private void UnregisterCallbacks(IPCActions instance)
@@ -421,6 +447,9 @@ public partial class @RPGInputActions: IInputActionCollection2, IDisposable
             @Magic.started -= instance.OnMagic;
             @Magic.performed -= instance.OnMagic;
             @Magic.canceled -= instance.OnMagic;
+            @Execute.started -= instance.OnExecute;
+            @Execute.performed -= instance.OnExecute;
+            @Execute.canceled -= instance.OnExecute;
         }
 
         public void RemoveCallbacks(IPCActions instance)
@@ -494,6 +523,7 @@ public partial class @RPGInputActions: IInputActionCollection2, IDisposable
         void OnHeavyAttack(InputAction.CallbackContext context);
         void OnFramwork(InputAction.CallbackContext context);
         void OnMagic(InputAction.CallbackContext context);
+        void OnExecute(InputAction.CallbackContext context);
     }
     public interface INewactionmapActions
     {

@@ -9,7 +9,8 @@ public enum StateType{
     HeavyAttack,
     Hit,
     Framework,
-    Magic
+    Magic,
+    Execute
 }
 
 public abstract class PlayerState

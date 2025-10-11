@@ -26,11 +26,21 @@ public class DodgeState :PlayerState
             dodgeDir = player.transform.forward;
         }
     }
+
+    public override void BeAttacked(int damage)
+    {
+        Debug.Log("被打倒," + isInvincible);
+        if (isInvincible)
+            return;
+        base.BeAttacked(damage);
+    }
+
     float timer = 0f;
     private bool isToRun = true;
     // 这里主要防止
     private bool canClick = true;
     private Vector3 dodgeDir;
+    bool isInvincible = false;
     public override void Update()
     {
         // 长按shift，进入奔跑，否则进入idle
@@ -41,10 +51,12 @@ public class DodgeState :PlayerState
         if (timer >= invincibleStartTime && timer <= invincibleStartTime + invincibleTime)
         {
             // 这里设置无敌帧
+            isInvincible = true;
         }
         else
         {
             // 这里关闭无敌帧
+            isInvincible = false;
         }
         
         player.velocity.x += dodgeDir.x * dodgeSpeed;

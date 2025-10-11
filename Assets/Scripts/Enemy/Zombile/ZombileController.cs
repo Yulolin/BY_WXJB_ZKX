@@ -1,6 +1,7 @@
 ﻿
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ZombileController : MonoBehaviour,IEnemyInterface
 {
@@ -25,6 +26,10 @@ public class ZombileController : MonoBehaviour,IEnemyInterface
     private EHitState hitState;
     private EPatrolState patrolState;
     private EPursuitState pursuitState;
+    private EBeExecuteState beExecuteState;
+
+    public Transform target;
+    public Slider hpSlider;
 
     private void Awake()
     {
@@ -33,6 +38,7 @@ public class ZombileController : MonoBehaviour,IEnemyInterface
         hitState = new EHitState(this);
         patrolState = new EPatrolState(this);
         pursuitState = new EPursuitState(this);
+        beExecuteState = new EBeExecuteState(this);
         
         currentState = idleState;
     }
@@ -40,11 +46,25 @@ public class ZombileController : MonoBehaviour,IEnemyInterface
     private void Start()
     {
         player = PlayerManager.Instance.player.transform;
+        hpSlider.maxValue = HP;
     }
 
     private void Update()
     {
         currentState.Update();
+        
+
+        if (gameObject == PlayerManager.Instance.targetEnemy)
+        {
+            hpSlider.gameObject.SetActive(true);
+            Vector3 screenPos = Camera.main.WorldToScreenPoint(target.position);
+            screenPos.y += 100;
+            hpSlider.GetComponent<RectTransform>().position = screenPos;
+        }
+        else
+        {
+            hpSlider.gameObject.SetActive(false);
+        }
     }
 
     public void ChangeState(EStateType type)
@@ -61,6 +81,7 @@ public class ZombileController : MonoBehaviour,IEnemyInterface
             case EStateType.Pursuit:currentState = pursuitState; break;
             case EStateType.Attack : currentState = attackState; break;
             case EStateType.Hit : currentState = hitState; break;
+            case EStateType.BeExecute:currentState = beExecuteState; break;
         }
         currentState.Enter();
     }
@@ -94,6 +115,7 @@ public class ZombileController : MonoBehaviour,IEnemyInterface
     public void ByAttacked(int damage)
     {
         HP -= damage;
+        hpSlider.value = HP;
         ChangeState(EStateType.Hit);
     }
 }

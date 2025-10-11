@@ -5,15 +5,41 @@ using UnityEngine;
 public class PlayerManager : MonoBehaviour
 {
     public static PlayerManager Instance;
-    
-    public int HP = 100;
+
+    private int hp = 100;
+
+    public int HP
+    {
+        get { return hp; }
+        set
+        {
+            hp = Mathf.Clamp(value, 0, MaxHP);
+            OnHpChanged?.Invoke(hp);
+        }
+    }
+    public int MaxHP = 100;
     public float AttackPower = 10;
     public float HeavyAttackRatio = 2;
-    public float SyncRate = 100;
+    private float syncRate = 100;
+
+    public float SyncRate
+    {
+        get { return syncRate; }
+        set
+        {
+            syncRate = Mathf.Clamp(value, 0, MaxSyncRate);
+            OnSyncChanged?.Invoke(syncRate);
+        }
+    }
+    public float MaxSyncRate = 100;
 
     public GameObject targetEnemy;
+    public bool canExecute = false;
 
     public PlayerController player;
+    
+    public Action<int> OnHpChanged;
+    public Action<float> OnSyncChanged;
 
     private void Awake()
     {

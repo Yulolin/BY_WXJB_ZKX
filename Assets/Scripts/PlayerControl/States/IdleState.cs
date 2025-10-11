@@ -47,6 +47,10 @@ public class IdleState :PlayerState
         {
             player.ChangeState(StateType.Magic);
         }
+        if(player.TryExecute())
+        {
+            player.ChangeState(StateType.Execute);
+        }
     }
 
     public override void Exit()

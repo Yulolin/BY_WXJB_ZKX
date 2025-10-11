@@ -24,6 +24,7 @@ public class PlayerController : MonoBehaviour
     private HitState hitState;
     private FrameworkState frameworkState;
     private MagicState magicState;
+    private ExecuteState excuteState;
 
     private void Awake()
     {
@@ -41,13 +42,14 @@ public class PlayerController : MonoBehaviour
         hitState = new HitState(this);
         frameworkState = new FrameworkState(this);
         magicState = new MagicState(this);
+        excuteState = new ExecuteState(this);
         
         currentState = idleState;
-        PlayerManager.Instance.player = this;
     }
 
     private void Start()
     {
+        PlayerManager.Instance.player = this;
     }
 
     private void OnEnable()
@@ -74,7 +76,96 @@ public class PlayerController : MonoBehaviour
         currentState.Update();
 
         characterController.Move(velocity * Time.deltaTime);
+
+        UpDateTargetEnemy();
     }
+
+    public Transform targetEnemy;
+    public float lockOnRange = 50f;  // 锁定范围
+    private float centerAreaWidth = 0.5f;  // 屏幕中心区域宽度（例如：0.2表示20%的屏幕宽度）
+    private float centerAreaHeight = 1f;  // 屏幕中心区域高度（例如：0.2表示20%的屏幕高度）
+public void UpDateTargetEnemy()
+{
+    // 获取视野范围内的敌人
+    Collider[] hitEnemies = Physics.OverlapSphere(transform.position, lockOnRange);
+
+    Transform closestEnemy = null;
+    float closestDistance = Mathf.Infinity;  // 初始化为无穷大，表示我们会寻找最小距离
+    float closestDot = -Mathf.Infinity;  // 用来判断敌人是否在视野中心
+
+    foreach (Collider enemy in hitEnemies)
+    {
+        if (enemy.CompareTag("Enemy"))  // 检查是否是敌人
+        {
+            Camera playerCamera = Camera.main;
+            Vector3 enemyScreenPos = playerCamera.WorldToScreenPoint(enemy.transform.position);
+
+            // 判断敌人是否在摄像头的前方
+            Vector3 directionToEnemy = enemy.transform.position - playerCamera.transform.position;
+            float dot = Vector3.Dot(playerCamera.transform.forward, directionToEnemy);
+
+            // 如果敌人不在摄像头前方，则跳过
+            if (dot < 0)
+                continue;  // 如果小于0，说明敌人在摄像头背后，跳过此敌人
+
+            // 计算敌人距离摄像头视野中心的距离（屏幕坐标中的位置）
+            Vector3 screenCenter = new Vector3(Screen.width / 2, Screen.height / 2, 0);
+
+            // 判断敌人是否在屏幕中央的区域内
+            float minX = (Screen.width * (1 - centerAreaWidth)) / 2;
+            float maxX = (Screen.width * (1 + centerAreaWidth)) / 2;
+            float minY = (Screen.height * (1 - centerAreaHeight)) / 2;
+            float maxY = (Screen.height * (1 + centerAreaHeight)) / 2;
+
+            // 如果敌人的屏幕坐标在中心区域内
+            if (enemyScreenPos.x > minX && enemyScreenPos.x < maxX && enemyScreenPos.y > minY &&
+                enemyScreenPos.y < maxY)
+            {
+                // 计算敌人与玩家的距离
+                float distanceToPlayer = Vector3.Distance(enemy.transform.position, transform.position);
+
+                // 如果这个敌人在视野内，并且离玩家最近，就锁定
+                if (distanceToPlayer < closestDistance)
+                {
+                    closestDistance = distanceToPlayer;
+                    closestEnemy = enemy.transform;
+                }
+            }
+        }
+    }
+
+    // 如果找到了最近的敌人，标记为锁定目标
+    if (closestEnemy != null)
+    {
+        targetEnemy = closestEnemy;
+        PlayerManager.Instance.targetEnemy = targetEnemy.gameObject;
+
+        // 判断玩家是否在敌人背后并更新标识颜色
+        Vector3 directionToEnemy = targetEnemy.position - Camera.main.transform.position;
+        float dotToEnemy = Vector3.Dot(targetEnemy.forward, directionToEnemy);
+
+        if (dotToEnemy > 0)  // 玩家在敌人背后
+        {
+            PlayerManager.Instance.canExecute = true;
+        }
+        else
+        {
+            PlayerManager.Instance.canExecute = false;
+        }
+
+        // 如果需要让摄像头朝向敌人
+        // transform.LookAt(targetEnemy);  // 取消注释以启用摄像头朝向
+    }
+    else
+    {
+        // 没有敌人，取消锁定
+        targetEnemy = null;
+        PlayerManager.Instance.targetEnemy = null;
+        PlayerManager.Instance.canExecute = false;
+    }
+}
+
+
     
     public void ChangeState(StateType type)
     {
@@ -94,7 +185,8 @@ public class PlayerController : MonoBehaviour
             case StateType.HeavyAttack: newState = heavyAttackState; break;
             case StateType.Hit:newState = hitState; break;
             case StateType.Framework: newState = frameworkState; break;
-            case  StateType.Magic: newState = magicState; break;
+            case StateType.Magic: newState = magicState; break;
+            case StateType.Execute: newState = excuteState; break;
         }
         currentState?.Exit();
         currentState = newState;
@@ -219,6 +311,16 @@ public class PlayerController : MonoBehaviour
             return true;
         }
 
+        return false;
+    }
+
+    public bool TryExecute()
+    {
+        if (rpgInputActions.PC.Execute.IsPressed())
+        {
+            return PlayerManager.Instance.canExecute;
+            
+        }
         return false;
     }
 
